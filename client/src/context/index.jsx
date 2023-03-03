@@ -32,7 +32,7 @@ export const GlobalContextProvider = ({ children }) => {
     activeBattle: null,
   });
   const [updateGameData, setUpdateGameData] = useState(0);
-
+  const [battleGround, setBattleGround] = useState("bg-astral");
   //*Set the wallet address to the state
 
   const updateCurrentWalletAddress = async () => {
@@ -133,6 +133,8 @@ export const GlobalContextProvider = ({ children }) => {
         battleName,
         setBattleName,
         gameData,
+        battleGround,
+        setBattleGround,
       }}
     >
       {children}
