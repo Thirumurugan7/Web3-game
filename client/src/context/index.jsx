@@ -31,6 +31,8 @@ export const GlobalContextProvider = ({ children }) => {
     pendingBattles: [],
     activeBattle: null,
   });
+  const [updateGameData, setUpdateGameData] = useState(0);
+
   //*Set the wallet address to the state
 
   const updateCurrentWalletAddress = async () => {
@@ -79,8 +81,8 @@ export const GlobalContextProvider = ({ children }) => {
         provider,
         walletAddress,
         setShowAlert,
-        battleName,
-        setBattleName,
+
+        setUpdateGameData,
       });
     }
   }, [contract]);
@@ -98,7 +100,7 @@ export const GlobalContextProvider = ({ children }) => {
 
       fetchedBattles.forEach((battle) => {
         if (
-          battle.player.find(
+          battle.players.find(
             (player) => player.toLowerCase() === walletAddress.toLowerCase()
           )
         ) {
@@ -111,7 +113,7 @@ export const GlobalContextProvider = ({ children }) => {
     };
 
     if (contract) fetchGameData();
-  }, [contract]);
+  }, [contract, updateGameData]);
 
   useEffect(() => {
     if (showAlert?.status) {

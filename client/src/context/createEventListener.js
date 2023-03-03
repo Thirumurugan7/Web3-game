@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { ethers, providers } from "ethers";
 
 import { ABI } from "../contract";
 //here cb is callback function
@@ -17,6 +17,7 @@ export const createEventListener = ({
   provider,
   walletAddress,
   setShowAlert,
+  setUpdateGameData,
 }) => {
   //here newplayer is a event for creating a new player
   //refer solidity contract
@@ -30,6 +31,20 @@ export const createEventListener = ({
         type: "success",
         message: "Player has been created Successfully",
       });
+    }
+  });
+
+  const NewBattleEventFilter = contract.filters.NewBattle();
+
+  AddNewEvent(NewBattleEventFilter, provider, ({ args }) => {
+    console.log("new battle started!", args, walletAddress);
+    if (
+      walletAddress.toLowerCase() === args.player1.toLowerCase() ||
+      walletAddress.toLowerCase() === args.player2.toLowerCase()
+    ) {
+      navigate(`/battle/${args.battleName}`);
+
+      setUpdateGameData((prevUpdateGameData) => prevUpdateGameData + 1);
     }
   });
 };
