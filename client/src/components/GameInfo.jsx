@@ -67,10 +67,7 @@ const GameInfo = () => {
             title="Change Background"
             handleClick={() => navigate("/battleground")}
           />
-          <CustomButton
-            title="Exit Background"
-            handleClick={handleBattleExit}
-          />
+          <CustomButton title="Exit Battle" handleClick={handleBattleExit} />
         </div>
       </div>
     </>

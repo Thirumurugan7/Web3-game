@@ -60,7 +60,7 @@ const Battle = () => {
         const p1H = player01.playerHealth.toNumber();
         const p1M = player01.playerMana.toNumber();
         const p2H = player02.playerHealth.toNumber();
-        const p2M = player02.playerHealth.toNumber();
+        const p2M = player02.playerMana.toNumber();
 
         setPlayer1({
           ...player01,
@@ -88,7 +88,9 @@ const Battle = () => {
     playAudio(choice === 1 ? attackSound : defenseSound);
 
     try {
-      await contract.attackOrDefendChoice(choice, battleName);
+      await contract.attackOrDefendChoice(choice, battleName, {
+        gasLimit: 200000,
+      });
 
       setShowAlert({
         status: true,

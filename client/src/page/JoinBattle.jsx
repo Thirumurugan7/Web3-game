@@ -27,7 +27,7 @@ const JoinBattle = () => {
   const handleClick = async (battleName) => {
     setBattleName(battleName);
     try {
-      await contract.joinBattle(battleName);
+      await contract.joinBattle(battleName, { gasLimit: 200000 });
 
       setShowAlert({
         status: true,
