@@ -6,12 +6,27 @@ import CustomButton from "./CustomButton";
 import { useGlobalContext } from "../context";
 import { alertIcon, gameRules } from "../assets";
 const GameInfo = () => {
-  const { contract, gameData, setShowAlert } = useGlobalContext();
+  const { contract, gameData, setShowAlert, setErrorMessage } =
+    useGlobalContext();
   const [toggleSidebar, setToggleSidebar] = useState(false);
 
   const navigate = useNavigate();
 
-  const handleBattleExit = async () => {};
+  const handleBattleExit = async () => {
+    const battleName = gameData.activeBattle.name;
+
+    try {
+      await contract.quitBattle(battleName);
+
+      setShowAlert({
+        status: true,
+        type: "info",
+        message: `You're quitting the ${battleName}`,
+      });
+    } catch (error) {
+      setErrorMessage(error);
+    }
+  };
   return (
     <>
       <div className={styles.gameInfoIconBox}>

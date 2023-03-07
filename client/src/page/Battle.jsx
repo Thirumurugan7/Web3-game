@@ -24,6 +24,8 @@ const Battle = () => {
     setShowAlert,
     battleGround,
     setErrorMessage,
+    player1Ref,
+    player2Ref,
   } = useGlobalContext();
 
   const [player1, setPlayer1] = useState({});
@@ -75,7 +77,7 @@ const Battle = () => {
           mana: p2M,
         });
       } catch (error) {
-        console.log(error);
+        setErrorMessage(error);
       }
     };
     if (contract && gameData.activeBattle) getPlayerInfo();
@@ -86,9 +88,7 @@ const Battle = () => {
     playAudio(choice === 1 ? attackSound : defenseSound);
 
     try {
-      await contract.attackOrDefendChoice(choice, battleName, {
-        gasLimit: 200000,
-      });
+      await contract.attackOrDefendChoice(choice, battleName);
 
       setShowAlert({
         status: true,
@@ -99,6 +99,14 @@ const Battle = () => {
       setErrorMessage(error);
     }
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!gameData?.activeBattle) navigate("/");
+    }, [2000]);
+
+    return () => clearTimeout(timer);
+  });
   return (
     <div
       className={`${styles.flexBetween} ${styles.gameContainer} ${battleGround} `}
@@ -109,22 +117,27 @@ const Battle = () => {
       <PlayerInfo player={player2} playerIcon={player02Icon} />
 
       <div className={`${styles.flexCenter} flex-col my-10`}>
-        <Card card={player2} title={player2?.playerName} cardRef="" playerTwo />
+        <Card
+          card={player2}
+          title={player2?.playerName}
+          cardRef={player2Ref}
+          playerTwo
+        />
         <div className="flex flex-row items-center">
           <ActionButton
             imgUrl={attack}
-            handleClick={makeAMove(1)}
+            handleClick={() => makeAMove(1)}
             restStyles="mr-2 hover:border-yellow-400"
           />
           <Card
             card={player1}
             title={player1?.playerName}
-            cardRef=""
+            cardRef={player1Ref}
             restStyles="mt-3"
           />
           <ActionButton
             imgUrl={defense}
-            handleClick={makeAMove(2)}
+            handleClick={() => makeAMove(2)}
             restStyles="ml-6 hover:border-red-600"
           />
         </div>

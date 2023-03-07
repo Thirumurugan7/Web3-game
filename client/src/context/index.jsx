@@ -36,6 +36,8 @@ export const GlobalContextProvider = ({ children }) => {
   const [battleGround, setBattleGround] = useState("bg-astral");
   const [step, setStep] = useState(1);
   const [errorMessage, setErrorMessage] = useState("");
+  const player1Ref = useRef();
+  const player2Ref = useRef();
   useEffect(() => {
     const battleGroundFromLocalStorage = localStorage.getItem("battleground");
 
@@ -107,6 +109,8 @@ export const GlobalContextProvider = ({ children }) => {
         setShowAlert,
 
         setUpdateGameData,
+        player1Ref,
+        player2Ref,
       });
     }
   }, [contract, step]);
@@ -178,6 +182,9 @@ export const GlobalContextProvider = ({ children }) => {
         setBattleGround,
         errorMessage,
         setErrorMessage,
+        player1Ref,
+        player2Ref,
+        updateCurrentWalletAddress,
       }}
     >
       {children}
