@@ -14,7 +14,7 @@ import {
   player02 as player02Icon,
 } from "../assets";
 
-import { playAudio } from "../utils/animation";
+import { playAudio } from "../utils/animation.js";
 const Battle = () => {
   const {
     contract,
@@ -23,6 +23,7 @@ const Battle = () => {
     showAlert,
     setShowAlert,
     battleGround,
+    setErrorMessage,
   } = useGlobalContext();
 
   const [player1, setPlayer1] = useState({});
@@ -30,6 +31,7 @@ const Battle = () => {
 
   const { battleName } = useParams();
   const navigate = useNavigate();
+
   useEffect(() => {
     const getPlayerInfo = async () => {
       try {
@@ -78,6 +80,25 @@ const Battle = () => {
     };
     if (contract && gameData.activeBattle) getPlayerInfo();
   }, [contract, gameData, battleName]);
+
+  const makeAMove = async (choice) => {
+    console.log(choice, "click");
+    playAudio(choice === 1 ? attackSound : defenseSound);
+
+    try {
+      await contract.attackOrDefendChoice(choice, battleName, {
+        gasLimit: 200000,
+      });
+
+      setShowAlert({
+        status: true,
+        type: "info",
+        message: `Initiating ${choice === 1 ? "attack" : "defend"}`,
+      });
+    } catch (error) {
+      setErrorMessage(error);
+    }
+  };
   return (
     <div
       className={`${styles.flexBetween} ${styles.gameContainer} ${battleGround} `}
@@ -92,7 +113,7 @@ const Battle = () => {
         <div className="flex flex-row items-center">
           <ActionButton
             imgUrl={attack}
-            handleClick={() => {}}
+            handleClick={makeAMove(1)}
             restStyles="mr-2 hover:border-yellow-400"
           />
           <Card
@@ -103,7 +124,7 @@ const Battle = () => {
           />
           <ActionButton
             imgUrl={defense}
-            handleClick={() => {}}
+            handleClick={makeAMove(2)}
             restStyles="ml-6 hover:border-red-600"
           />
         </div>

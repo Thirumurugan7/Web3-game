@@ -13,6 +13,7 @@ import { ethers } from "ethers";
 import Web3Modal from "web3modal";
 import { ABI, ADDRESS } from "../contract";
 import { createEventListener } from "./createEventListener";
+import { GetParams } from "../utils/onboard";
 const GlobalContext = createContext();
 
 export const GlobalContextProvider = ({ children }) => {
@@ -33,6 +34,29 @@ export const GlobalContextProvider = ({ children }) => {
   });
   const [updateGameData, setUpdateGameData] = useState(0);
   const [battleGround, setBattleGround] = useState("bg-astral");
+  const [step, setStep] = useState(1);
+  const [errorMessage, setErrorMessage] = useState("");
+  useEffect(() => {
+    const battleGroundFromLocalStorage = localStorage.getItem("battleground");
+
+    if (battleGroundFromLocalStorage) {
+      setBattleGround(battleGroundFromLocalStorage);
+    } else {
+      localStorage.setItem("battleground", battleGround);
+    }
+  });
+
+  //* Rest web3 onboarding modal process
+  useEffect(() => {
+    const resetParams = async () => {
+      const currentStep = await GetParams();
+      setStep(currentStep.step);
+    };
+    resetParams();
+
+    window?.ethereum?.on("chainChanged", () => resetParams());
+    window?.ethereum?.on("accountsChanged", () => resetParams());
+  });
   //*Set the wallet address to the state
 
   const updateCurrentWalletAddress = async () => {
@@ -74,7 +98,7 @@ export const GlobalContextProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (contract) {
+    if (step !== -1 && contract) {
       createEventListener({
         navigate,
         contract,
@@ -85,7 +109,7 @@ export const GlobalContextProvider = ({ children }) => {
         setUpdateGameData,
       });
     }
-  }, [contract]);
+  }, [contract, step]);
 
   // * Set the game data to the state
   useEffect(() => {
@@ -123,6 +147,23 @@ export const GlobalContextProvider = ({ children }) => {
       return () => clearTimeout(timer);
     }
   }, [showAlert]);
+
+  //* handle error messages
+  // the parsing line - slice the string by leaving thr specified "execution reverted"
+  useEffect(() => {
+    if (errorMessage) {
+      const parsedMessage = errorMessage?.reason
+        ?.slice("execution reverted: ".length)
+        .slice(0, -1);
+      if (parsedMessage) {
+        setShowAlert({
+          status: true,
+          type: "failure",
+          message: parsedMessage,
+        });
+      }
+    }
+  }, [errorMessage]);
   return (
     <GlobalContext.Provider
       value={{
@@ -135,6 +176,8 @@ export const GlobalContextProvider = ({ children }) => {
         gameData,
         battleGround,
         setBattleGround,
+        errorMessage,
+        setErrorMessage,
       }}
     >
       {children}
