@@ -40,4 +40,6 @@ Stacks used:
 <li>Hardhat</li>
 <li>ethersJS</li>
 
+Hosted Link: 
+https://gryffindors-avax-game.netlify.app/
 
